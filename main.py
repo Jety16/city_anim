@@ -75,8 +75,8 @@ class DISPLAY():
 
             change = not change
 
-    def _load(self):
-        for i in range(2):
+    def _load(self, load_cycles):
+        for i in range(load_cycles):
             for j in range(0, 70):
                 self.oled.hline(30, 30, j, 1)
                 self.oled.show()
@@ -88,7 +88,7 @@ class DISPLAY():
 
 
 display = DISPLAY()
-display._load()
+display._load(1)
 switch = Pin(10, Pin.IN)
 while True:
     if switch.value():
