@@ -4,9 +4,8 @@ import time
 
 
 class DISPLAY():
-
     def __init__(self):
-        self.hspi = SPI(1)
+        self.hspi = SPI(1)  # sck=14 (scl), mosi=13 (sda), miso=12 (unused)
         self.i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
         self.oled = SSD1306_I2C(128, 64, self.i2c)
         self.inverted = 0  # 0 normal, 1 inverted
@@ -18,61 +17,66 @@ class DISPLAY():
         self.oled.hline(x, y, length, 1)
         self.oled.hline(x, y + length, length, 1)
 
-    def anim(self):
+    def anim(self, y):
         pad = 10
-        length = 10
+        length = 20
         change = False
-
-        for     i in range(0, 256, 1):
-                x_1 = int(i / 2)
-                x_2 = int(i % 64 + x_1 / 2)
-                y_1 = i
-                y_2 = y_1 - length
+        off_set = 20
+        steps = 2
+        for j in range(y, y + off_set):
+            for i in range(0, 86, steps):
                 self.oled.fill(0)
-    
-                # Spidy
-                self.oled.line((84 + x_2 % 16), 34, 94, 34, 1)
-                if not change:
-                    self.oled.line((84 + x_2 % 16), 34, x_2, y_1, 1)
+                x_1 = i
+                if i < 20:
+                    x_2 = i - 20
+                elif i < 50:
+                    x_2 = i
+                elif i < 80:
+                    x_2 = i + (i % 50)
                 else:
-                    self.oled.line((84 + x_2 % 16), 34, x_2 - 40, y_1 + 48, 1)
-    
+                    x_2 = i
+                y_1 = 5
+                y_2 = y_1 - length
+
+                self.oled.line(0, y_1 + length + pad, 128, y_1 + length + pad, 1)
+                self.oled.text('-  -   -   -   -   -  -', 0, y_1 + 32, 1)
+                self.oled.line(0, y_1 + length + 10 + pad, 128, y_1 + length + 10 + pad, 1)
+
                 # City
-                self._square(x_1, y_1, length)
-                self._square(x_2, y_2, length)
                 self._square(x_1 + 48, y_1 + 48, length)
                 self._square(x_2 + 48, y_2 + 48, length)
-    
                 self.oled.line(x_2 + 48, y_2 + 48, x_2 + 48, y_2 + 48, 1)
-                self.oled.line(x_1 + length + 48, y_1 + 48,
-                               x_2 + length + 48, y_2 + 48, 1)
-                self.oled.line(x_1 + 48, y_1 + length + 48,
-                               x_2 + 48, y_2 + length + 48, 1)
-                self.oled.line(x_1 + length + 48, y_1 + length + 48,
-                               x_2 + length + 48, y_2 + length + 48, 1)
-                self.oled.line(x_2, y_2, x_2, y_2, 1)
-                self.oled.line(x_1 + length, y_1, x_2 + length, y_2, 1)
-                self.oled.line(x_1, y_1 + length, x_2, y_2 + length, 1)
-                self.oled.line(x_1 + length, y_1 + length,
-                               x_2 + length, y_2 + length, 1)
-                self.oled.line(0, y_1 + length + pad, 128, y_1 + length + pad, 1)
-                self.oled.line(0, y_1 + length + 20 + pad, 128, y_1 + length + 20 + pad, 1)
-    
-                self._square(x_1 + - 40, y_1 + 48, length)
-                self._square(x_2 + - 40, y_2 + 48, length)
-                self.oled.line(x_2 + - 40, y_2 + 48, x_2 + - 40, y_2 + 48, 1)
-                self.oled.line(x_1 + length + - 40, y_1 + 48,
-                               x_2 + length + - 40, y_2 + 48, 1)
-                self.oled.line(x_1 + - 40, y_1 + length + 48,
-                               x_2 + - 40, y_2 + length + 48, 1)
-                self.oled.line(x_1 + length + - 40, y_1 + length +
-                               48, x_2 + length + - 40, y_2 + length + 48, 1)
+                self.oled.line(x_1 + length + 48, y_1 + 48, x_2 + length + 48, y_2 + 48, 1)
+                self.oled.line(x_1 + 48, y_1 + length + 48, x_2 + 48, y_2 + length + 48, 1)
+                self.oled.line(x_1 + length + 48, y_1 + length + 48, x_2 + length + 48, y_2 + length + 48, 1)
+
+                self._square(x_1 - 40, y_1 + 48, length)
+                self._square(x_2 - 40, y_2 + 48, length)
+                self.oled.line(x_2 - 40, y_2 + 48, x_2 - 40, y_2 + 48, 1)
+                self.oled.line(x_1 + length - 40, y_1 + 48, x_2 + length - 40, y_2 + 48, 1)
+                self.oled.line(x_1 - 40, y_1 + length + 48, x_2 - 40, y_2 + length + 48, 1)
+                self.oled.line(x_1 + length - 40, y_1 + length + 48, x_2 + length - 40, y_2 + length + 48, 1)
+
+                self._square(x_1 + 36, y_1, length)
+                self._square(x_2 + 36, y_2, length)
+                self.oled.line(x_2 + 36, y_2, x_2 + 20, y_2, 1)
+                self.oled.line(x_1 + length + 36, y_1, x_2 + length + 36, y_2, 1)
+                self.oled.line(x_1 + 36, y_1 + length, x_2 + 36, y_2 + length, 1)
+                self.oled.line(x_1 + length + 36, y_1 + length, x_2 + length + 36, y_2 + length, 1)
+
+                self._square(x_1 - 46, y_1, length)
+                self._square(x_2 - 46, y_2, length)
+                self.oled.line(x_2 - 46, y_2, x_2 - 46, y_2, 1)
+                self.oled.line(x_1 + length - 46, y_1, x_2 + length - 46, y_2, 1)
+                self.oled.line(x_1 - 46, y_1 + length, x_2 - 46, y_2 + length, 1)
+                self.oled.line(x_1 + length - 46, y_1 + length, x_2 + length - 46, y_2 + length, 1)
                 self.oled.show()
                 time.sleep(0.06)
-                change = not change
 
-    def _load(self, load_cycles):
-        for i in range(load_cycles):
+            change = not change
+
+    def _load(self):
+        for i in range(2):
             for j in range(0, 70):
                 self.oled.hline(30, 30, j, 1)
                 self.oled.show()
@@ -84,8 +88,8 @@ class DISPLAY():
 
 
 display = DISPLAY()
-display._load(2)
-switch = Pin(21, Pin.IN, Pin.PULL_UP)
+display._load()
+switch = Pin(10, Pin.IN)
 while True:
-    if switch:
-        display.anim()
+    if switch.value():
+        display.anim(1)
